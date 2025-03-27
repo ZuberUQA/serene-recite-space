@@ -1,28 +1,32 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 50% 98%;
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 48 100% 95%;
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 187 73% 40%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 16 89% 64%;
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 45 100% 68%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -32,22 +36,15 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -96,6 +93,90 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-dhikr-background text-dhikr-text font-sans antialiased overflow-x-hidden min-h-screen;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-arabic {
+    font-family: 'Amiri', serif;
+    line-height: 1.6;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-md;
+  }
+  
+  .bead {
+    @apply w-6 h-6 rounded-full transition-all duration-300 ease-out;
+  }
+  
+  .bead-container {
+    @apply relative flex items-center justify-center;
+  }
+  
+  .bead-highlight {
+    @apply absolute w-8 h-8 rounded-full border-2 border-dhikr-primary/70;
+  }
+  
+  .count-button {
+    @apply w-16 h-16 rounded-full flex items-center justify-center 
+           transition-all duration-300 ease-out shadow-lg active:scale-95;
+  }
+  
+  .control-button {
+    @apply rounded-full p-3 flex items-center justify-center 
+           transition-all duration-200 ease-out active:scale-95;
+  }
+}
+
+/* Custom background with subtle gradient */
+.app-bg {
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Custom page transitions */
+.page-enter {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Pulse effect for the counter button */
+.pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(26, 156, 176, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(26, 156, 176, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(26, 156, 176, 0);
   }
 }
