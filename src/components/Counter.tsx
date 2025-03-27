@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
 
@@ -10,6 +10,8 @@ interface CounterProps {
 }
 
 const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  
   const { 
     count, 
     loop,
@@ -30,6 +32,8 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   
   // Sound effect
   const playTickSound = () => {
+    if (!soundEnabled) return;
+    
     const audio = new Audio('/tick.mp3');
     audio.volume = 0.5;
     try {
@@ -50,10 +54,9 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   }, [count, loop, total, onCountChange]);
 
   const handleIncrement = () => {
-    if (paused) return;
     increment();
     vibrate();
-    // playTickSound();
+    playTickSound();
   };
 
   return (
@@ -68,9 +71,9 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={handleIncrement}
+          onClick={togglePause}
           className={`count-button ${paused ? 'bg-white text-dhikr-secondary' : 'bg-dhikr-secondary text-white'} ${!paused && 'pulse-ring'}`}
-          aria-label={paused ? "Resume" : "Increment counter"}
+          aria-label={paused ? "Resume" : "Pause counter"}
         >
           {paused ? (
             <Play size={32} className="ml-1" />
@@ -80,7 +83,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={increment}
+          onClick={handleIncrement}
           className="control-button bg-white/80 text-dhikr-text/70 hover:bg-white hover:text-dhikr-primary shadow"
           aria-label="Next"
         >
@@ -108,11 +111,11 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={() => {}}
+          onClick={() => setSoundEnabled(!soundEnabled)}
           className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
           aria-label="Toggle sound"
         >
-          <Volume2 size={20} />
+          {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </div>
     </div>
