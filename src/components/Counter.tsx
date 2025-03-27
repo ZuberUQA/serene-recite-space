@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
@@ -28,14 +28,37 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   });
   
   const { vibrate } = useVibration({ enabled: true });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio('/tick.mp3');
+    audioRef.current.volume = 0.5;
+    
+    // Preload the audio
+    try {
+      audioRef.current.load();
+    } catch (error) {
+      console.error('Error loading audio:', error);
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
   
   // Sound effect
   const playTickSound = () => {
-    const audio = new Audio('/tick.mp3');
-    audio.volume = 0.5;
+    if (!audioRef.current) return;
+    
     try {
-      audio.play().catch(err => {
-        // Browsers may block autoplay
+      // Create a clone to allow rapid succession of sounds
+      const soundClone = audioRef.current.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.5;
+      soundClone.play().catch(err => {
         console.log('Audio play failed:', err);
       });
     } catch (error) {
@@ -54,15 +77,16 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     if (paused) return;
     increment();
     vibrate();
-    // playTickSound();
+    playTickSound();
   };
 
   return (
     <div className="flex flex-col items-center">
-      {/* Add the new ScrollingPearl component */}
+      {/* ScrollingPearl component */}
       <ScrollingPearl 
         onIncrement={handleIncrement}
         disabled={paused}
+        color="#FFD15C" // Yellow pearl color matching the design
       />
       
       <div className="flex justify-between items-center w-full max-w-xs mb-5">

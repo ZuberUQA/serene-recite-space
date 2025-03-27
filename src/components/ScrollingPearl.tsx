@@ -15,6 +15,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pearlRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [offsetX, setOffsetX] = useState(0);
@@ -56,6 +57,11 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
     setIsDragging(true);
     setStartX(clientX);
     setHasIncremented(false);
+    
+    // Apply a slight scale-up effect when starting to drag
+    if (pearlRef.current) {
+      pearlRef.current.style.transform = 'scale(1.05)';
+    }
   };
 
   // Handle mouse/touch move
@@ -69,7 +75,11 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
       // Apply some resistance to the movement for a more tactile feel
       const resistance = 0.7;
       const movement = deltaX * resistance;
-      pearlRef.current.style.transform = `translateX(${movement}px)`;
+      
+      // Add a slight vertical arc to the movement
+      const verticalMovement = Math.sin(Math.abs(movement) * 0.01) * -5; // Small arc
+      
+      pearlRef.current.style.transform = `translateX(${movement}px) translateY(${verticalMovement}px)`;
       
       // Check if we've moved enough to increment and haven't already incremented in this gesture
       if (deltaX > incrementThreshold && !hasIncremented) {
@@ -80,10 +90,10 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
         
         // Give some feedback by briefly changing the scale
         if (pearlRef.current) {
-          pearlRef.current.style.transform = `translateX(${movement}px) scale(1.1)`;
+          pearlRef.current.style.transform = `translateX(${movement}px) translateY(${verticalMovement}px) scale(1.1)`;
           setTimeout(() => {
             if (pearlRef.current && isDragging) {
-              pearlRef.current.style.transform = `translateX(${movement}px) scale(1)`;
+              pearlRef.current.style.transform = `translateX(${movement}px) translateY(${verticalMovement}px) scale(1)`;
             }
           }, 100);
         }
@@ -173,20 +183,56 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
     }
   };
 
+  // Create visual beads in the track
+  const renderBeads = () => {
+    const beads = [];
+    const beadColors = ['#E0A872', '#D88C5A', '#E0A872', '#D88C5A', '#E0A872'];
+    
+    for (let i = 0; i < 5; i++) {
+      const isCenter = i === 2;
+      beads.push(
+        <div 
+          key={i}
+          className={`absolute rounded-full ${isCenter ? 'w-12 h-12 bg-amber-400' : 'w-10 h-10'}`}
+          style={{
+            left: `${i * 25}%`,
+            backgroundColor: isCenter ? color : beadColors[i],
+            transform: isCenter ? 'translateX(-50%)' : 'translateX(-50%)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.2)',
+            backgroundImage: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%)',
+            display: isCenter ? 'block' : 'none', // Only show center bead initially
+            zIndex: isCenter ? 2 : 1
+          }}
+        />
+      );
+    }
+    
+    return beads;
+  };
+
   return (
     <div 
-      className="w-full pt-4 pb-8"
+      className="w-full pt-8 pb-10"
       aria-label="Swipe the yellow pearl right to increment counter"
     >
-      <div className="flex items-center justify-center h-20">
+      <div className="flex items-center justify-center h-24">
         <div 
           ref={containerRef}
           className="relative w-full max-w-xs h-16 flex items-center justify-center"
         >
-          {/* Track line */}
-          <div className="absolute h-0.5 w-4/5 bg-gray-300/50 rounded-full"></div>
+          {/* Track string */}
+          <div 
+            ref={trackRef}
+            className="absolute h-0.5 w-4/5 bg-amber-800/20 rounded-full"
+            style={{
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+            }}
+          ></div>
           
-          {/* Pearl */}
+          {/* Render other beads in track */}
+          {renderBeads()}
+          
+          {/* Interactive Pearl */}
           <div 
             ref={pearlRef}
             className={`absolute w-14 h-14 rounded-full shadow-lg cursor-pointer 
@@ -194,7 +240,8 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
             style={{ 
               backgroundColor: color,
               backgroundImage: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 -4px 6px rgba(0, 0, 0, 0.1), inset 0 4px 6px rgba(255, 255, 255, 0.4)'
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 -4px 6px rgba(0, 0, 0, 0.1), inset 0 4px 6px rgba(255, 255, 255, 0.4)',
+              zIndex: 10
             }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -206,7 +253,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
           />
           
           {/* Visual guide arrows */}
-          <div className="absolute flex justify-between w-56 px-2 text-gray-400/40 pointer-events-none">
+          <div className="absolute flex justify-between w-56 px-2 text-amber-700/40 pointer-events-none">
             <div className="transform -translate-x-2">←</div>
             <div className="transform translate-x-2">→</div>
           </div>
