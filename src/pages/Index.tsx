@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import DhikrCard from '../components/DhikrCard';
 import SettingsPanel from '../components/SettingsPanel';
-import { getDefaultDhikr, defaultDhikrPhrases } from '../utils/dhikrData';
-import { useToast } from '../hooks/use-toast';
+import { getDefaultDhikr } from '../utils/dhikrData';
+import { toast } from '../hooks/use-toast';
 
 const Index = () => {
   const [currentDhikr, setCurrentDhikr] = useState(getDefaultDhikr());
   const [loopSize, setLoopSize] = useState(33);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { toast } = useToast();
   
   const toggleSettings = () => {
     setSettingsOpen(prev => !prev);
