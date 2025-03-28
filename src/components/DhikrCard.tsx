@@ -15,6 +15,7 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
   const [loop, setLoop] = useState(1);
   const [total, setTotal] = useState(0);
   const [beadColor, setBeadColor] = useState('gold');
+  const [showBeadCustomizer, setShowBeadCustomizer] = useState(false);
   
   const handleCountChange = (newCount: number, newLoop: number, newTotal: number) => {
     setCount(newCount);
@@ -24,6 +25,10 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
   
   const handleColorChange = (colorId: string) => {
     setBeadColor(colorId);
+  };
+  
+  const toggleBeadCustomizer = () => {
+    setShowBeadCustomizer(prev => !prev);
   };
   
   // Apply entry animation when dhikr changes
@@ -41,12 +46,15 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
           onCountChange={handleCountChange} 
         />
         
-        <BeadVisualizer 
-          count={count} 
-          loopSize={loopSize} 
-          selectedColor={beadColor}
-          onColorChange={handleColorChange}
-        />
+        {showBeadCustomizer && (
+          <BeadVisualizer 
+            count={count} 
+            loopSize={loopSize} 
+            selectedColor={beadColor}
+            onColorChange={handleColorChange}
+            onClose={toggleBeadCustomizer}
+          />
+        )}
       </div>
     </div>
   );

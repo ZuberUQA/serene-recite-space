@@ -1,8 +1,10 @@
 
-import React, { useEffect } from 'react';
-import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
+import useSound from '../hooks/useSound';
+import ScrollingPearl from './ScrollingPearl';
 
 interface CounterProps {
   loopSize: number;
@@ -10,6 +12,9 @@ interface CounterProps {
 }
 
 const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [selectedColor, setSelectedColor] = useState('gold');
+  
   const { 
     count, 
     loop,
@@ -22,25 +27,33 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   } = useCounter({ 
     loopSize,
     onLoopComplete: () => {
-      // Could play sound or show notification
+      // Play complete sound when loop is completed
+      completeSound.play();
     }
   });
   
-  const { vibrate } = useVibration({ enabled: true });
+  const { vibrate } = useVibration({ 
+    enabled: true,
+    intensity: 'medium'
+  });
   
-  // Sound effect
-  const playTickSound = () => {
-    const audio = new Audio('/tick.mp3');
-    audio.volume = 0.5;
-    try {
-      audio.play().catch(err => {
-        // Browsers may block autoplay
-        console.log('Audio play failed:', err);
-      });
-    } catch (error) {
-      console.error('Error playing sound:', error);
-    }
-  };
+  const { play: playTickSound, isEnabled, toggleSound } = useSound({
+    enabled: soundEnabled,
+    volume: 0.5,
+    soundType: 'tick'
+  });
+  
+  const completeSound = useSound({
+    enabled: soundEnabled,
+    volume: 0.6,
+    soundType: 'complete'
+  });
+  
+  const resetSound = useSound({
+    enabled: soundEnabled,
+    volume: 0.5,
+    soundType: 'reset'
+  });
   
   // Notify parent about count changes
   useEffect(() => {
@@ -50,14 +63,39 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   }, [count, loop, total, onCountChange]);
 
   const handleIncrement = () => {
-    if (paused) return;
+    if (paused) {
+      togglePause();
+      return;
+    }
+    
     increment();
     vibrate();
-    // playTickSound();
+    
+    if (isEnabled) {
+      playTickSound();
+    }
   };
-
+  
+  const handleReset = () => {
+    reset();
+    resetSound.play();
+  };
+  
+  const togglePlayPause = () => {
+    togglePause();
+  };
+  
   return (
     <div className="flex flex-col items-center">
+      {/* Scrolling Pearl Animation */}
+      <ScrollingPearl
+        count={count}
+        loopSize={loopSize}
+        selectedColor={selectedColor}
+        onIncrement={handleIncrement}
+        animationEnabled={!paused}
+      />
+      
       <div className="flex justify-between items-center w-full max-w-xs mb-5">
         <button
           onClick={decrement}
@@ -68,9 +106,9 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={handleIncrement}
+          onClick={togglePlayPause}
           className={`count-button ${paused ? 'bg-white text-dhikr-secondary' : 'bg-dhikr-secondary text-white'} ${!paused && 'pulse-ring'}`}
-          aria-label={paused ? "Resume" : "Increment counter"}
+          aria-label={paused ? "Resume" : "Pause counter"}
         >
           {paused ? (
             <Play size={32} className="ml-1" />
@@ -100,7 +138,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
       
       <div className="flex justify-center mt-6 space-x-5">
         <button
-          onClick={reset}
+          onClick={handleReset}
           className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
           aria-label="Reset counter"
         >
@@ -108,11 +146,11 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={() => {}}
+          onClick={toggleSound}
           className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
-          aria-label="Toggle sound"
+          aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
-          <Volume2 size={20} />
+          {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </div>
     </div>
