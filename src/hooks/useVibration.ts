@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 interface UseVibrationProps {
   enabled?: boolean;
@@ -12,15 +12,9 @@ export const useVibration = ({
   pattern = [50],
   intensity = 'medium'
 }: UseVibrationProps = {}) => {
-  const lastVibrationTime = useRef<number>(0);
   
   const vibrate = useCallback(() => {
     if (!enabled) return;
-    
-    // Prevent vibration spamming by adding cooldown
-    const now = Date.now();
-    if (now - lastVibrationTime.current < 100) return;
-    lastVibrationTime.current = now;
     
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
@@ -51,3 +45,4 @@ export const useVibration = ({
 };
 
 export default useVibration;
+

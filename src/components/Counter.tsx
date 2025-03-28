@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
 import ScrollingPearl from './ScrollingPearl';
@@ -27,39 +27,15 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     }
   });
   
-  const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
   const { vibrate } = useVibration({ enabled: true });
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  // Initialize audio element
-  useEffect(() => {
-    audioRef.current = new Audio('/tick.mp3');
-    audioRef.current.volume = 0.5;
-    
-    // Preload the audio
-    try {
-      audioRef.current.load();
-    } catch (error) {
-      console.error('Error loading audio:', error);
-    }
-    
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
   
   // Sound effect
   const playTickSound = () => {
-    if (!audioRef.current || !audioEnabled) return;
-    
+    const audio = new Audio('/tick.mp3');
+    audio.volume = 0.5;
     try {
-      // Create a clone to allow rapid succession of sounds
-      const soundClone = audioRef.current.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.5;
-      soundClone.play().catch(err => {
+      audio.play().catch(err => {
+        // Browsers may block autoplay
         console.log('Audio play failed:', err);
       });
     } catch (error) {
@@ -78,23 +54,15 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     if (paused) return;
     increment();
     vibrate();
-    playTickSound();
-  };
-
-  const toggleAudio = () => {
-    setAudioEnabled(prev => !prev);
+    // playTickSound();
   };
 
   return (
     <div className="flex flex-col items-center">
-      {/* ScrollingPearl component with enhanced animation */}
+      {/* Add the new ScrollingPearl component */}
       <ScrollingPearl 
         onIncrement={handleIncrement}
         disabled={paused}
-        color="#FFD15C" // Yellow pearl color matching the design
-        currentCount={count}
-        loopSize={loopSize}
-        audioEnabled={audioEnabled}
       />
       
       <div className="flex justify-between items-center w-full max-w-xs mb-5">
@@ -147,11 +115,11 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={toggleAudio}
+          onClick={() => {}}
           className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
-          aria-label={audioEnabled ? "Mute sound" : "Enable sound"}
+          aria-label="Toggle sound"
         >
-          {audioEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          <Volume2 size={20} />
         </button>
       </div>
     </div>
