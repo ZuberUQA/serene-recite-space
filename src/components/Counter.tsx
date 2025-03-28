@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef } from 'react';
-import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
 import ScrollingPearl from './ScrollingPearl';
@@ -27,6 +27,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     }
   });
   
+  const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
   const { vibrate } = useVibration({ enabled: true });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -52,7 +53,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   
   // Sound effect
   const playTickSound = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !audioEnabled) return;
     
     try {
       // Create a clone to allow rapid succession of sounds
@@ -80,13 +81,20 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     playTickSound();
   };
 
+  const toggleAudio = () => {
+    setAudioEnabled(prev => !prev);
+  };
+
   return (
     <div className="flex flex-col items-center">
-      {/* ScrollingPearl component */}
+      {/* ScrollingPearl component with enhanced animation */}
       <ScrollingPearl 
         onIncrement={handleIncrement}
         disabled={paused}
         color="#FFD15C" // Yellow pearl color matching the design
+        currentCount={count}
+        loopSize={loopSize}
+        audioEnabled={audioEnabled}
       />
       
       <div className="flex justify-between items-center w-full max-w-xs mb-5">
@@ -139,11 +147,11 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={() => {}}
+          onClick={toggleAudio}
           className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
-          aria-label="Toggle sound"
+          aria-label={audioEnabled ? "Mute sound" : "Enable sound"}
         >
-          <Volume2 size={20} />
+          {audioEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </div>
     </div>
