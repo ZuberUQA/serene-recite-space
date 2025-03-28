@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Environment, Bounds, useBounds } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Mesh, Vector3, MeshStandardMaterial, SphereGeometry } from 'three';
 import { useSpring, animated } from '@react-spring/three';
 
@@ -9,12 +9,11 @@ interface BeadProps {
   position: [number, number, number];
   color: string;
   size?: number;
-  onClick?: () => void;
   isHighlighted?: boolean;
   index: number;
 }
 
-const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, onClick, isHighlighted, index }) => {
+const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, isHighlighted, index }) => {
   const meshRef = useRef<Mesh>(null);
   const geometry = new SphereGeometry(1, 32, 32);
   
@@ -40,11 +39,10 @@ const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, onClick, isHig
       ref={meshRef}
       position={[position[0], posY, position[2]]}
       scale={scale}
-      onClick={onClick}
       castShadow
       receiveShadow
     >
-      <primitive object={geometry} attach="geometry" />
+      <sphereGeometry args={[1, 32, 32]} />
       <meshStandardMaterial
         color={color}
         metalness={0.8}
@@ -63,13 +61,6 @@ interface TasbihBeadsProps {
 }
 
 const BeadString: React.FC<TasbihBeadsProps> = ({ count, loopSize, color = 'gold', onBeadClick }) => {
-  const bounds = useBounds();
-  
-  useEffect(() => {
-    // Select all beads
-    bounds.refresh().clip().fit();
-  }, [count, loopSize]);
-
   const calculateBeadPosition = (index: number, total: number): [number, number, number] => {
     const radius = 2.5;
     const angleStep = (2 * Math.PI) / total;
@@ -83,19 +74,34 @@ const BeadString: React.FC<TasbihBeadsProps> = ({ count, loopSize, color = 'gold
   };
 
   return (
-    <group>
+    <group onClick={onBeadClick}>
       {Array.from({ length: loopSize }).map((_, index) => (
         <Bead
           key={`bead-${index}`}
           position={calculateBeadPosition(index, loopSize)}
-          color={color}
+          color={getBeadColor(color)}
           isHighlighted={index < count}
-          onClick={onBeadClick}
           index={index}
         />
       ))}
     </group>
   );
+};
+
+// Helper function to convert color IDs to actual hex colors
+const getBeadColor = (colorId: string): string => {
+  const colorMap: Record<string, string> = {
+    'gold': '#D4AF37',
+    'silver': '#C0C0C0',
+    'emerald': '#50C878',
+    'ruby': '#E0115F',
+    'sapphire': '#0F52BA',
+    'amber': '#FFBF00',
+    'pearl': '#F5F7F8',
+    'obsidian': '#3D3635'
+  };
+  
+  return colorMap[colorId] || colorMap.gold;
 };
 
 const TasbihBeads: React.FC<TasbihBeadsProps> = (props) => {
@@ -107,7 +113,6 @@ const TasbihBeads: React.FC<TasbihBeadsProps> = (props) => {
         <pointLight position={[10, 10, 10]} intensity={1} castShadow />
         <pointLight position={[-10, -10, -10]} intensity={0.5} />
         
-        {/* Simple environment without external files */}
         <directionalLight 
           position={[5, 5, 5]} 
           intensity={1} 
@@ -116,9 +121,7 @@ const TasbihBeads: React.FC<TasbihBeadsProps> = (props) => {
           shadow-mapSize-height={1024}
         />
         
-        <Bounds fit clip observe margin={1.2}>
-          <BeadString {...props} />
-        </Bounds>
+        <BeadString {...props} />
         
         <OrbitControls 
           enableZoom={false}

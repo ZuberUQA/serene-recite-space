@@ -10,6 +10,10 @@ import {
 interface TasbihStyleSelectorProps {
   selectedColor: string;
   onChange: (colorId: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+  selectedStyle?: 'beads' | 'digital';
+  onStyleChange?: (style: 'beads' | 'digital') => void;
 }
 
 const BEAD_COLORS = [
@@ -23,20 +27,35 @@ const BEAD_COLORS = [
   { id: 'obsidian', name: 'Obsidian', color: '#3D3635' }
 ];
 
-const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({ selectedColor, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({ 
+  selectedColor, 
+  onChange, 
+  isOpen = false,
+  onClose = () => {},
+  selectedStyle = 'beads',
+  onStyleChange
+}) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   const handleSelectColor = (colorId: string) => {
     onChange(colorId);
-    setIsOpen(false);
+    setDialogOpen(false);
+    if (onClose) onClose();
   };
   
   const selectedColorData = BEAD_COLORS.find(c => c.id === selectedColor) || BEAD_COLORS[0];
 
+  // If isOpen is provided, use it, otherwise use internal state
+  const isDialogOpen = isOpen !== undefined ? isOpen : dialogOpen;
+  const handleDialogOpenChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open && onClose) onClose();
+  };
+
   return (
     <div className="mt-2">
       <button 
-        onClick={() => setIsOpen(true)}
+        onClick={() => setDialogOpen(true)}
         className="flex items-center text-xs text-dhikr-text/60 hover:text-dhikr-primary transition-colors"
       >
         <div 
@@ -46,11 +65,39 @@ const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({ selectedColor
         <span>Change style</span>
       </button>
       
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog 
+        open={isDialogOpen} 
+        onOpenChange={onClose ? (open) => !open && onClose() : handleDialogOpenChange}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Select Tasbih Style</DialogTitle>
           </DialogHeader>
+          
+          {onStyleChange && (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button
+                className={`flex flex-col items-center p-3 rounded-lg transition-all ${
+                  selectedStyle === 'beads' 
+                    ? 'bg-dhikr-primary/10 ring-2 ring-dhikr-primary' 
+                    : 'hover:bg-gray-100'
+                }`}
+                onClick={() => onStyleChange('beads')}
+              >
+                <span className="text-sm">Beads</span>
+              </button>
+              <button
+                className={`flex flex-col items-center p-3 rounded-lg transition-all ${
+                  selectedStyle === 'digital' 
+                    ? 'bg-dhikr-primary/10 ring-2 ring-dhikr-primary' 
+                    : 'hover:bg-gray-100'
+                }`}
+                onClick={() => onStyleChange('digital')}
+              >
+                <span className="text-sm">Digital</span>
+              </button>
+            </div>
+          )}
           
           <div className="grid grid-cols-4 gap-3 mt-4">
             {BEAD_COLORS.map((color) => (

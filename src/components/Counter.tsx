@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
+import TasbihBeads from './TasbihBeads';
+import TasbihStyleSelector from './TasbihStyleSelector';
 
 interface CounterProps {
   loopSize: number;
@@ -11,6 +13,9 @@ interface CounterProps {
 
 const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [beadColor, setBeadColor] = useState('gold');
+  const [countStyle, setCountStyle] = useState<'beads' | 'digital'>('beads');
+  const [styleDialogOpen, setStyleDialogOpen] = useState(false);
   
   const { 
     count, 
@@ -101,6 +106,23 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </div>
       </div>
       
+      {countStyle === 'beads' && (
+        <div className="mt-6 w-full">
+          <TasbihBeads 
+            count={count}
+            loopSize={loopSize}
+            color={beadColor}
+            onBeadClick={handleIncrement}
+          />
+          <div className="flex justify-center">
+            <TasbihStyleSelector 
+              selectedColor={beadColor} 
+              onChange={setBeadColor}
+            />
+          </div>
+        </div>
+      )}
+      
       <div className="flex justify-center mt-6 space-x-5">
         <button
           onClick={reset}
@@ -117,7 +139,25 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
+        
+        <button
+          onClick={() => setStyleDialogOpen(true)}
+          className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
+          aria-label="Change counter style"
+        >
+          <span className="text-xs">Style</span>
+        </button>
       </div>
+      
+      {/* Style selector dialog */}
+      <TasbihStyleSelector
+        selectedColor={beadColor}
+        onChange={setBeadColor}
+        isOpen={styleDialogOpen}
+        onClose={() => setStyleDialogOpen(false)}
+        selectedStyle={countStyle}
+        onStyleChange={setCountStyle}
+      />
     </div>
   );
 };
