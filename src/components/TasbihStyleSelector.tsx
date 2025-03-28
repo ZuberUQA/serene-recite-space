@@ -54,16 +54,18 @@ const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({
 
   return (
     <div className="mt-2">
-      <button 
-        onClick={() => setDialogOpen(true)}
-        className="flex items-center text-xs text-dhikr-text/60 hover:text-dhikr-primary transition-colors"
-      >
-        <div 
-          className="w-4 h-4 rounded-full mr-1 border border-white/30 shadow-inner" 
-          style={{ backgroundColor: selectedColorData.color }}
-        />
-        <span>Change style</span>
-      </button>
+      {!isOpen && (
+        <button 
+          onClick={() => setDialogOpen(true)}
+          className="flex items-center text-xs text-dhikr-text/60 hover:text-dhikr-primary transition-colors"
+        >
+          <div 
+            className="w-4 h-4 rounded-full mr-1 border border-white/30 shadow-inner" 
+            style={{ backgroundColor: selectedColorData.color }}
+          />
+          <span>Change style</span>
+        </button>
+      )}
       
       <Dialog 
         open={isDialogOpen} 

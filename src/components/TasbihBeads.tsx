@@ -1,9 +1,8 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Mesh, Vector3, MeshStandardMaterial, SphereGeometry } from 'three';
-import { useSpring, animated } from '@react-spring/three';
+import { Mesh } from 'three';
 
 interface BeadProps {
   position: [number, number, number];
@@ -15,30 +14,35 @@ interface BeadProps {
 
 const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, isHighlighted, index }) => {
   const meshRef = useRef<Mesh>(null);
-  const geometry = new SphereGeometry(1, 32, 32);
   
-  // Create animated position and rotation for the bead
-  const { spring } = useSpring({
-    spring: isHighlighted ? 1 : 0,
-    config: { mass: 1, tension: 280, friction: 60 }
-  });
-  
-  const scale = spring.to([0, 1], [size, size * 1.2]);
-  const posY = spring.to([0, 1], [position[1], position[1] + 0.2]);
-  
-  // Slow gentle rotation effect
+  // Simple animation without spring
   useFrame((state) => {
     if (meshRef.current) {
+      // Basic rotation animation
       meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.2 + index * 0.2;
       meshRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.5 + index * 0.3) * 0.1;
+      
+      // Pulsing effect for highlighted beads
+      if (isHighlighted) {
+        const pulse = Math.sin(state.clock.getElapsedTime() * 3) * 0.05 + 1;
+        meshRef.current.scale.setScalar(size * (pulse + 0.2));
+      } else {
+        meshRef.current.scale.setScalar(size);
+      }
+      
+      // Small position adjustment for highlighted beads
+      if (isHighlighted) {
+        meshRef.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
+      } else {
+        meshRef.current.position.y = position[1];
+      }
     }
   });
 
   return (
-    <animated.mesh
+    <mesh
       ref={meshRef}
-      position={[position[0], posY, position[2]]}
-      scale={scale}
+      position={[position[0], position[1], position[2]]}
       castShadow
       receiveShadow
     >
@@ -49,7 +53,7 @@ const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, isHighlighted,
         roughness={0.2}
         envMapIntensity={1}
       />
-    </animated.mesh>
+    </mesh>
   );
 };
 

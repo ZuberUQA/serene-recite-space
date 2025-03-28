@@ -114,12 +114,6 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
             color={beadColor}
             onBeadClick={handleIncrement}
           />
-          <div className="flex justify-center">
-            <TasbihStyleSelector 
-              selectedColor={beadColor} 
-              onChange={setBeadColor}
-            />
-          </div>
         </div>
       )}
       
@@ -153,7 +147,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
       <TasbihStyleSelector
         selectedColor={beadColor}
         onChange={setBeadColor}
-        isOpen={styleDialogOpen}
+        isOpen={styleDialogOpen} 
         onClose={() => setStyleDialogOpen(false)}
         selectedStyle={countStyle}
         onStyleChange={setCountStyle}
