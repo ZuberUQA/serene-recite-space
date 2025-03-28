@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
@@ -11,11 +11,20 @@ interface CounterProps {
   onCountChange?: (count: number, loop: number, total: number) => void;
 }
 
+const CLICK_SOUNDS = {
+  soft: '/sounds/bead-soft.mp3',
+  wooden: '/sounds/bead-wood.mp3',
+  crystal: '/sounds/bead-crystal.mp3'
+};
+
 const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundType, setSoundType] = useState<keyof typeof CLICK_SOUNDS>('soft');
   const [beadColor, setBeadColor] = useState('gold');
   const [countStyle, setCountStyle] = useState<'beads' | 'digital'>('beads');
   const [styleDialogOpen, setStyleDialogOpen] = useState(false);
+  const [showBeadsInstruction, setShowBeadsInstruction] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const { 
     count, 
@@ -30,26 +39,23 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     loopSize,
     onLoopComplete: () => {
       // Could play sound or show notification
+      playTickSound(1.5);
     }
   });
   
   const { vibrate } = useVibration({ enabled: true });
-  
-  // Sound effect
-  const playTickSound = () => {
-    if (!soundEnabled) return;
-    
-    const audio = new Audio('/tick.mp3');
-    audio.volume = 0.5;
-    try {
-      audio.play().catch(err => {
-        // Browsers may block autoplay
-        console.log('Audio play failed:', err);
-      });
-    } catch (error) {
-      console.error('Error playing sound:', error);
-    }
-  };
+
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio(CLICK_SOUNDS[soundType]);
+    audioRef.current.preload = 'auto';
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [soundType]);
   
   // Notify parent about count changes
   useEffect(() => {
@@ -58,6 +64,29 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
     }
   }, [count, loop, total, onCountChange]);
 
+  // Hide instruction after first count
+  useEffect(() => {
+    if (total > 0 && showBeadsInstruction) {
+      setShowBeadsInstruction(false);
+    }
+  }, [total, showBeadsInstruction]);
+  
+  // Sound effect
+  const playTickSound = (volumeMultiplier = 1) => {
+    if (!soundEnabled || !audioRef.current) return;
+    
+    try {
+      // Clone the audio element for overlapping sounds
+      const audioClone = new Audio(audioRef.current.src);
+      audioClone.volume = 0.5 * volumeMultiplier;
+      audioClone.play().catch(err => {
+        console.log('Audio play failed:', err);
+      });
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  };
+  
   const handleIncrement = () => {
     increment();
     vibrate();
@@ -107,13 +136,19 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
       </div>
       
       {countStyle === 'beads' && (
-        <div className="mt-6 w-full">
+        <div className="mt-6 w-full relative">
           <TasbihBeads 
             count={count}
             loopSize={loopSize}
             color={beadColor}
             onBeadClick={handleIncrement}
           />
+          
+          {showBeadsInstruction && (
+            <div className="absolute bottom-4 left-0 right-0 text-center text-dhikr-text/70 animate-bounce">
+              Tap any bead to count
+            </div>
+          )}
         </div>
       )}
       
@@ -128,7 +163,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         
         <button
           onClick={() => setSoundEnabled(!soundEnabled)}
-          className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
+          className={`control-button ${soundEnabled ? 'bg-dhikr-accent/20' : 'bg-white/80'} text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm`}
           aria-label="Toggle sound"
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -151,6 +186,10 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         onClose={() => setStyleDialogOpen(false)}
         selectedStyle={countStyle}
         onStyleChange={setCountStyle}
+        onSoundTypeChange={setSoundType}
+        soundType={soundType}
+        soundEnabled={soundEnabled}
+        onSoundToggle={() => setSoundEnabled(!soundEnabled)}
       />
     </div>
   );

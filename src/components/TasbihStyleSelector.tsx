@@ -1,22 +1,17 @@
 
-import React, { useState } from 'react';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle 
-} from './ui/dialog';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Volume2, VolumeX } from 'lucide-react';
+import TasbihBeads from './TasbihBeads';
 
-interface TasbihStyleSelectorProps {
-  selectedColor: string;
-  onChange: (colorId: string) => void;
-  isOpen?: boolean;
-  onClose?: () => void;
-  selectedStyle?: 'beads' | 'digital';
-  onStyleChange?: (style: 'beads' | 'digital') => void;
+interface ColorOption {
+  id: string;
+  name: string;
+  color: string;
 }
 
-const BEAD_COLORS = [
+const BEAD_COLORS: ColorOption[] = [
   { id: 'gold', name: 'Gold', color: '#D4AF37' },
   { id: 'silver', name: 'Silver', color: '#C0C0C0' },
   { id: 'emerald', name: 'Emerald', color: '#50C878' },
@@ -27,29 +22,69 @@ const BEAD_COLORS = [
   { id: 'obsidian', name: 'Obsidian', color: '#3D3635' }
 ];
 
-const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({ 
-  selectedColor, 
-  onChange, 
+const SOUND_OPTIONS = [
+  { id: 'soft', name: 'Soft Click' },
+  { id: 'wooden', name: 'Wooden' },
+  { id: 'crystal', name: 'Crystal' }
+];
+
+interface TasbihStyleSelectorProps {
+  selectedColor: string;
+  onChange: (colorId: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+  selectedStyle?: 'beads' | 'digital';
+  onStyleChange?: (style: 'beads' | 'digital') => void;
+  soundType?: string;
+  onSoundTypeChange?: (soundType: any) => void;
+  soundEnabled?: boolean;
+  onSoundToggle?: () => void;
+}
+
+const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({
+  selectedColor = 'gold',
+  onChange,
   isOpen = false,
-  onClose = () => {},
+  onClose,
   selectedStyle = 'beads',
-  onStyleChange
+  onStyleChange,
+  soundType = 'soft',
+  onSoundTypeChange,
+  soundEnabled = false,
+  onSoundToggle
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [previewColor, setPreviewColor] = useState(selectedColor);
   
-  const handleSelectColor = (colorId: string) => {
+  // Sync internal state with props
+  useEffect(() => {
+    setDialogOpen(isOpen);
+  }, [isOpen]);
+  
+  // If dialog is closed externally
+  useEffect(() => {
+    if (!dialogOpen && onClose) {
+      onClose();
+    }
+  }, [dialogOpen, onClose]);
+  
+  const handleColorSelect = (colorId: string) => {
+    setPreviewColor(colorId);
     onChange(colorId);
-    setDialogOpen(false);
-    if (onClose) onClose();
   };
   
   const selectedColorData = BEAD_COLORS.find(c => c.id === selectedColor) || BEAD_COLORS[0];
-
-  // If isOpen is provided, use it, otherwise use internal state
-  const isDialogOpen = isOpen !== undefined ? isOpen : dialogOpen;
-  const handleDialogOpenChange = (open: boolean) => {
-    setDialogOpen(open);
-    if (!open && onClose) onClose();
+  
+  const handleStyleChange = (style: 'beads' | 'digital') => {
+    if (onStyleChange) {
+      onStyleChange(style);
+    }
+  };
+  
+  const handleSoundTypeChange = (type: string) => {
+    if (onSoundTypeChange) {
+      onSoundTypeChange(type);
+    }
   };
 
   return (
@@ -68,57 +103,104 @@ const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({
       )}
       
       <Dialog 
-        open={isDialogOpen} 
-        onOpenChange={onClose ? (open) => !open && onClose() : handleDialogOpenChange}
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen}
       >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Select Tasbih Style</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-md bg-white p-6 rounded-xl">
+          <DialogTitle className="text-xl text-dhikr-primary font-medium">
+            Customize Tasbih
+          </DialogTitle>
           
-          {onStyleChange && (
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <button
-                className={`flex flex-col items-center p-3 rounded-lg transition-all ${
-                  selectedStyle === 'beads' 
-                    ? 'bg-dhikr-primary/10 ring-2 ring-dhikr-primary' 
-                    : 'hover:bg-gray-100'
-                }`}
-                onClick={() => onStyleChange('beads')}
-              >
-                <span className="text-sm">Beads</span>
-              </button>
-              <button
-                className={`flex flex-col items-center p-3 rounded-lg transition-all ${
-                  selectedStyle === 'digital' 
-                    ? 'bg-dhikr-primary/10 ring-2 ring-dhikr-primary' 
-                    : 'hover:bg-gray-100'
-                }`}
-                onClick={() => onStyleChange('digital')}
-              >
-                <span className="text-sm">Digital</span>
-              </button>
+          <div className="space-y-6 my-4">
+            <div>
+              <h3 className="text-sm font-medium mb-3">Display Style</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleStyleChange('beads')}
+                  className={`px-4 py-2 rounded-md ${
+                    selectedStyle === 'beads' 
+                      ? 'bg-dhikr-primary text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Beads
+                </button>
+                <button
+                  onClick={() => handleStyleChange('digital')}
+                  className={`px-4 py-2 rounded-md ${
+                    selectedStyle === 'digital' 
+                      ? 'bg-dhikr-primary text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Digital Only
+                </button>
+              </div>
             </div>
-          )}
+            
+            {selectedStyle === 'beads' && (
+              <div>
+                <h3 className="text-sm font-medium mb-3">Bead Color</h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {BEAD_COLORS.map(color => (
+                    <button
+                      key={color.id}
+                      onClick={() => handleColorSelect(color.id)}
+                      className={`flex flex-col items-center p-2 rounded-md ${
+                        previewColor === color.id ? 'bg-gray-100 ring-2 ring-dhikr-primary' : ''
+                      }`}
+                    >
+                      <div 
+                        className="w-8 h-8 rounded-full shadow-md" 
+                        style={{ backgroundColor: color.color }}
+                      />
+                      <span className="text-xs mt-1">{color.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div>
+              <h3 className="text-sm font-medium mb-3">Sound Options</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between bg-gray-50 rounded-md p-3">
+                  <span>Sounds</span>
+                  <button
+                    onClick={onSoundToggle}
+                    className={`p-2 rounded-full ${
+                      soundEnabled ? 'bg-dhikr-accent/20 text-dhikr-primary' : 'bg-gray-200 text-gray-500'
+                    }`}
+                  >
+                    {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                  </button>
+                </div>
+                
+                {soundEnabled && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {SOUND_OPTIONS.map(option => (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSoundTypeChange(option.id)}
+                        className={`px-3 py-2 text-sm rounded-md ${
+                          soundType === option.id 
+                            ? 'bg-dhikr-accent/20 text-dhikr-primary' 
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {option.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-4 gap-3 mt-4">
-            {BEAD_COLORS.map((color) => (
-              <button
-                key={color.id}
-                className={`flex flex-col items-center p-3 rounded-lg transition-all ${
-                  selectedColor === color.id 
-                    ? 'bg-dhikr-primary/10 ring-2 ring-dhikr-primary' 
-                    : 'hover:bg-gray-100'
-                }`}
-                onClick={() => handleSelectColor(color.id)}
-              >
-                <div 
-                  className="w-10 h-10 rounded-full mb-2 shadow-lg" 
-                  style={{ backgroundColor: color.color }}
-                />
-                <span className="text-xs">{color.name}</span>
-              </button>
-            ))}
+          <div className="flex justify-end space-x-2 mt-4">
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
