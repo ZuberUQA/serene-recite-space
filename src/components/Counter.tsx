@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import { Pause, Play, SkipBack, SkipForward, RotateCcw, Volume2 } from 'lucide-react';
 import useCounter from '../hooks/useCounter';
 import useVibration from '../hooks/useVibration';
-import ScrollingPearl from './ScrollingPearl';
 
 interface CounterProps {
   loopSize: number;
@@ -59,12 +58,6 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Add the new ScrollingPearl component */}
-      <ScrollingPearl 
-        onIncrement={handleIncrement}
-        disabled={paused}
-      />
-      
       <div className="flex justify-between items-center w-full max-w-xs mb-5">
         <button
           onClick={decrement}
@@ -75,9 +68,9 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         </button>
         
         <button
-          onClick={togglePause}
+          onClick={handleIncrement}
           className={`count-button ${paused ? 'bg-white text-dhikr-secondary' : 'bg-dhikr-secondary text-white'} ${!paused && 'pulse-ring'}`}
-          aria-label={paused ? "Resume" : "Pause counter"}
+          aria-label={paused ? "Resume" : "Increment counter"}
         >
           {paused ? (
             <Play size={32} className="ml-1" />
