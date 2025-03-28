@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -18,14 +17,7 @@ const BEAD_COLORS: ColorOption[] = [
   { id: 'ruby', name: 'Ruby', color: '#E0115F' },
   { id: 'sapphire', name: 'Sapphire', color: '#0F52BA' },
   { id: 'amber', name: 'Amber', color: '#FFBF00' },
-  { id: 'pearl', name: 'Pearl', color: '#F5F7F8' },
-  { id: 'obsidian', name: 'Obsidian', color: '#3D3635' }
-];
-
-const SOUND_OPTIONS = [
-  { id: 'soft', name: 'Soft Click' },
-  { id: 'wooden', name: 'Wooden' },
-  { id: 'crystal', name: 'Crystal' }
+  { id: 'pearl', name: 'Pearl', color: '#F5F7F8' }
 ];
 
 interface TasbihStyleSelectorProps {
@@ -56,12 +48,10 @@ const TasbihStyleSelector: React.FC<TasbihStyleSelectorProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [previewColor, setPreviewColor] = useState(selectedColor);
   
-  // Sync internal state with props
   useEffect(() => {
     setDialogOpen(isOpen);
   }, [isOpen]);
   
-  // If dialog is closed externally
   useEffect(() => {
     if (!dialogOpen && onClose) {
       onClose();

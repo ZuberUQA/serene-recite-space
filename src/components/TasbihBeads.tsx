@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -19,7 +18,6 @@ const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, isHighlighted,
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(false);
   
-  // Reset clicked state after animation completes
   useEffect(() => {
     if (clicked) {
       const timer = setTimeout(() => {
@@ -29,41 +27,32 @@ const Bead: React.FC<BeadProps> = ({ position, color, size = 0.5, isHighlighted,
     }
   }, [clicked]);
   
-  // Animation effects
   useFrame((state) => {
     if (!meshRef.current) return;
     
-    // Base rotation animation
     meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.2 + index * 0.2;
     meshRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.5 + index * 0.3) * 0.1;
     
-    // Scale effects based on state
     let targetScale = size;
     
     if (clicked) {
-      // Dramatic pulse when clicked
       const clickPulse = Math.sin(state.clock.getElapsedTime() * 15) * 0.2 + 1;
       targetScale = size * (clickPulse + 0.3);
     } else if (hovered) {
-      // Hover effect
       targetScale = size * 1.2;
     } else if (isActive) {
-      // Currently active bead (most recent count)
       const activePulse = Math.sin(state.clock.getElapsedTime() * 5) * 0.1 + 1;
       targetScale = size * (activePulse + 0.2);
     } else if (isHighlighted) {
-      // General highlighted beads (all counted so far)
       const pulse = Math.sin(state.clock.getElapsedTime() * 3) * 0.05 + 1;
       targetScale = size * (pulse + 0.1);
     }
     
-    // Smooth scale transition
     meshRef.current.scale.lerp(
       { x: targetScale, y: targetScale, z: targetScale } as any, 
       0.1
     );
     
-    // Position animation for highlighted beads
     if (isHighlighted) {
       meshRef.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
     } else {
@@ -111,7 +100,6 @@ interface TasbihBeadsProps {
 const BeadString: React.FC<TasbihBeadsProps> = ({ count, loopSize, color = 'gold', onBeadClick }) => {
   const [activeBead, setActiveBead] = useState<number | null>(count > 0 ? count - 1 : null);
   
-  // Update active bead when count changes
   useEffect(() => {
     if (count > 0) {
       setActiveBead((count - 1) % loopSize);
@@ -151,7 +139,6 @@ const BeadString: React.FC<TasbihBeadsProps> = ({ count, loopSize, color = 'gold
           onBeadClick={handleBeadClick}
         />
       ))}
-      {/* Thin string connecting the beads */}
       <mesh position={[0, -0.05, 0]}>
         <torusGeometry args={[2.5, 0.02, 8, loopSize]} />
         <meshStandardMaterial color="#d0d0d0" metalness={0.3} roughness={0.7} />
@@ -160,7 +147,6 @@ const BeadString: React.FC<TasbihBeadsProps> = ({ count, loopSize, color = 'gold
   );
 };
 
-// Helper function to convert color IDs to actual hex colors
 const getBeadColor = (colorId: string): string => {
   const colorMap: Record<string, string> = {
     'gold': '#D4AF37',
@@ -169,8 +155,7 @@ const getBeadColor = (colorId: string): string => {
     'ruby': '#E0115F',
     'sapphire': '#0F52BA',
     'amber': '#FFBF00',
-    'pearl': '#F5F7F8',
-    'obsidian': '#3D3635'
+    'pearl': '#F5F7F8'
   };
   
   return colorMap[colorId] || colorMap.gold;
