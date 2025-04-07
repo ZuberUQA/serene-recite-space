@@ -53,6 +53,15 @@ const Index = () => {
       setSoundsLoaded(true);
     }
     
+    // Initialize Web Speech API to request user permissions early
+    if ('speechSynthesis' in window) {
+      const testUtterance = new SpeechSynthesisUtterance('');
+      testUtterance.volume = 0; // Silent
+      testUtterance.rate = 0.1;
+      window.speechSynthesis.speak(testUtterance);
+      window.speechSynthesis.cancel(); // Cancel it immediately
+    }
+    
     const timeout = setTimeout(() => {
       if (!soundsLoaded) {
         setSoundsLoaded(true);
