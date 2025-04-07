@@ -37,7 +37,7 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
   }, [dhikr]);
 
   return (
-    <div className="glass-effect w-full max-w-md mx-auto rounded-3xl overflow-hidden animate-fade-in">
+    <div className="glass-effect w-full max-w-md mx-auto rounded-3xl overflow-hidden animate-fade-in dark:bg-gray-800/80 dark:border-gray-700/50">
       <div className="p-6 space-y-8">
         <DhikrText dhikr={dhikr} />
         

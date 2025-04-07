@@ -49,7 +49,7 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 220 20% 10%;
     --foreground: 210 40% 98%;
 
     --card: 222.2 84% 4.9%;
@@ -58,17 +58,17 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 187 73% 40%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 16 89% 64%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 100% 68%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -93,7 +93,7 @@
   }
 
   body {
-    @apply bg-dhikr-background text-dhikr-text font-sans antialiased overflow-x-hidden min-h-screen;
+    @apply bg-dhikr-background text-dhikr-text font-sans antialiased overflow-x-hidden min-h-screen dark:bg-gray-900 dark:text-gray-100;
     font-family: 'Poppins', sans-serif;
   }
 
@@ -105,7 +105,7 @@
 
 @layer components {
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-md;
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-md dark:bg-gray-800/80 dark:border-gray-700/20;
   }
   
   .bead {
@@ -117,7 +117,7 @@
   }
   
   .bead-highlight {
-    @apply absolute w-8 h-8 rounded-full border-2 border-dhikr-primary/70;
+    @apply absolute w-8 h-8 rounded-full border-2 border-dhikr-primary/70 dark:border-dhikr-accent/70;
   }
   
   .count-button {
@@ -138,7 +138,13 @@
   background-attachment: fixed;
 }
 
-/* Custom page transitions */
+.dark .app-bg {
+  background: linear-gradient(135deg, #1a1f2c 0%, #221f26 100%);
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Keep existing code for page transitions, pulse effect etc. */
 .page-enter {
   opacity: 0;
   transform: scale(0.98);
@@ -178,5 +184,24 @@
   100% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(26, 156, 176, 0);
+  }
+}
+
+.dark .pulse-ring {
+  animation: pulse-ring-dark 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring-dark {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 209, 92, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(255, 209, 92, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 209, 92, 0);
   }
 }
