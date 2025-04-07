@@ -53,7 +53,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
       return beadColors.find(c => c.id === selectedColor)?.color || '#D4AF37';
     }
     // Inactive beads are gray
-    return '#E0E0E0';
+    return '#C0C0C0'; // Slightly darker gray for better contrast
   };
   
   const handleContainerClick = () => {
@@ -69,7 +69,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
       onClick={handleContainerClick}
     >
       {/* Thin line connecting beads */}
-      <div className="absolute h-px w-full bg-gray-300 z-0" style={{ top: '50%' }}></div>
+      <div className="absolute h-1 w-full bg-gray-300 dark:bg-gray-600 z-0" style={{ top: '50%' }}></div>
       
       {/* Beads */}
       {beadPositions.map((position, index) => (
@@ -77,7 +77,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
           key={`bead-${index}`}
           className={`absolute transition-all duration-300 ease-out z-10
                     ${index === count - 1 ? 'animate-pulse-soft scale-125' : ''}
-                    ${index < count ? 'opacity-100' : 'opacity-70'}`}
+                    ${index < count ? 'opacity-100' : 'opacity-80'}`}
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`,
@@ -86,7 +86,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
         >
           {/* Highlight for current bead */}
           {index === count - 1 && count > 0 && (
-            <div className="absolute w-8 h-8 rounded-full border-2 border-dhikr-primary/70 animate-pulse"></div>
+            <div className="absolute w-8 h-8 rounded-full border-2 border-dhikr-primary/90 dark:border-dhikr-accent/90 animate-pulse"></div>
           )}
           
           {/* The bead itself */}
@@ -96,8 +96,8 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
                       ${index === count - 1 && count > 0 ? 'scale-125' : ''}`}
             style={{
               backgroundColor: getBeadColor(index),
-              boxShadow: index < count ? '0 4px 8px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.1)',
-              backgroundImage: `radial-gradient(circle at 30% 30%, ${getBeadColor(index)}, ${index < count ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'} 120%)`,
+              boxShadow: index < count ? '0 4px 8px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.15)',
+              backgroundImage: `radial-gradient(circle at 30% 30%, ${getBeadColor(index)}, ${index < count ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)'} 120%)`,
             }}
           ></div>
         </div>
@@ -105,7 +105,7 @@ const ScrollingPearl: React.FC<ScrollingPearlProps> = ({
       
       {/* "Tap to start" text when count is 0 */}
       {count === 0 && (
-        <div className="absolute bottom-0 left-0 right-0 text-center text-dhikr-text/60 pt-5">
+        <div className="absolute bottom-0 left-0 right-0 text-center text-dhikr-text/80 dark:text-white/80 font-medium pt-5">
           Tap to start tasbih
         </div>
       )}

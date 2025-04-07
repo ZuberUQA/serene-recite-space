@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import DhikrCard from '../components/DhikrCard';
@@ -98,7 +99,7 @@ const Index = () => {
             <h1 className="text-3xl font-bold text-dhikr-primary dark:text-dhikr-accent mb-2">
               Virtual Tasbih
             </h1>
-            <p className="text-dhikr-text/60 dark:text-gray-300/60">
+            <p className="text-dhikr-text/80 dark:text-gray-200/80 font-medium">
               Digital dhikr counter for your spiritual journey
             </p>
           </div>
@@ -119,7 +120,7 @@ const Index = () => {
         onLoopSizeChange={handleLoopSizeChange}
       />
       
-      <footer className="py-4 px-6 text-center text-sm text-dhikr-text/50 dark:text-white/50">
+      <footer className="py-4 px-6 text-center text-sm text-dhikr-text/70 dark:text-white/70 font-medium">
         <p>Virtual Tasbih - Digital Dhikr Counter</p>
       </footer>
     </div>

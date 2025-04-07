@@ -99,7 +99,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
       <div className="flex justify-between items-center w-full max-w-xs mb-5">
         <button
           onClick={decrement}
-          className="control-button bg-white/80 text-dhikr-text/70 hover:bg-white hover:text-dhikr-primary shadow"
+          className="control-button bg-white/90 dark:bg-gray-700 text-dhikr-text/80 dark:text-white/80 hover:bg-white hover:text-dhikr-primary dark:hover:bg-gray-600 dark:hover:text-dhikr-accent shadow"
           aria-label="Previous"
         >
           <SkipBack size={24} />
@@ -107,7 +107,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         
         <button
           onClick={togglePlayPause}
-          className={`count-button ${paused ? 'bg-white text-dhikr-secondary' : 'bg-dhikr-secondary text-white'} ${!paused && 'pulse-ring'}`}
+          className={`count-button ${paused ? 'bg-white dark:bg-gray-700 text-dhikr-secondary' : 'bg-dhikr-secondary text-white'} ${!paused && 'pulse-ring'}`}
           aria-label={paused ? "Resume" : "Pause counter"}
         >
           {paused ? (
@@ -119,7 +119,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         
         <button
           onClick={increment}
-          className="control-button bg-white/80 text-dhikr-text/70 hover:bg-white hover:text-dhikr-primary shadow"
+          className="control-button bg-white/90 dark:bg-gray-700 text-dhikr-text/80 dark:text-white/80 hover:bg-white hover:text-dhikr-primary dark:hover:bg-gray-600 dark:hover:text-dhikr-accent shadow"
           aria-label="Next"
         >
           <SkipForward size={24} />
@@ -127,19 +127,19 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
       </div>
       
       <div className="text-center">
-        <div className="text-5xl font-semibold text-dhikr-primary mb-2">
-          {count}<span className="text-dhikr-text/40">/{loopSize}</span>
+        <div className="text-5xl font-semibold text-dhikr-primary dark:text-dhikr-accent mb-2">
+          {count}<span className="text-dhikr-text/60 dark:text-white/60">/{loopSize}</span>
         </div>
         
-        <div className="text-sm text-dhikr-text/60">
-          Loop {loop} / Total: <span className="text-dhikr-primary">{total}</span>
+        <div className="text-sm font-medium text-dhikr-text/80 dark:text-white/80">
+          Loop {loop} / Total: <span className="text-dhikr-primary dark:text-dhikr-accent">{total}</span>
         </div>
       </div>
       
       <div className="flex justify-center mt-6 space-x-5">
         <button
           onClick={handleReset}
-          className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
+          className="control-button bg-white/90 dark:bg-gray-700 text-dhikr-text/80 dark:text-white/80 hover:text-dhikr-primary dark:hover:text-dhikr-accent hover:bg-white dark:hover:bg-gray-600 shadow-sm"
           aria-label="Reset counter"
         >
           <RotateCcw size={20} />
@@ -147,7 +147,7 @@ const Counter: React.FC<CounterProps> = ({ loopSize, onCountChange }) => {
         
         <button
           onClick={toggleSound}
-          className="control-button bg-white/80 text-dhikr-text/60 hover:text-dhikr-primary hover:bg-white shadow-sm"
+          className="control-button bg-white/90 dark:bg-gray-700 text-dhikr-text/80 dark:text-white/80 hover:text-dhikr-primary dark:hover:text-dhikr-accent hover:bg-white dark:hover:bg-gray-600 shadow-sm"
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}

@@ -13,17 +13,17 @@ const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
   const [infoOpen, setInfoOpen] = useState(false);
   
   return (
-    <header className="fixed top-0 left-0 right-0 px-6 py-4 bg-white/80 dark:bg-dhikr-text/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-50 animate-fade-in">
+    <header className="fixed top-0 left-0 right-0 px-6 py-4 bg-white/90 dark:bg-dhikr-text/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-50 animate-fade-in">
       <div className="max-w-screen-md mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold text-dhikr-primary dark:text-dhikr-accent">
+          <h1 className="text-xl font-semibold text-dhikr-primary dark:text-dhikr-accent font-bold">
             Virtual Tasbih
           </h1>
         </div>
         
         <div className="flex items-center space-x-4">
           <button
-            className="control-button text-dhikr-text/70 dark:text-white/70 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
+            className="control-button text-dhikr-text/80 dark:text-white/90 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
             onClick={() => setInfoOpen(true)}
             aria-label="Information"
           >
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
           </button>
           
           <button
-            className="control-button text-dhikr-text/70 dark:text-white/70 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
+            className="control-button text-dhikr-text/80 dark:text-white/90 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
           >
@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
           </button>
           
           <button
-            className="control-button text-dhikr-text/70 dark:text-white/70 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
+            className="control-button text-dhikr-text/80 dark:text-white/90 hover:text-dhikr-primary dark:hover:text-dhikr-accent transition-colors"
             onClick={onOpenSettings}
             aria-label="Settings"
           >
