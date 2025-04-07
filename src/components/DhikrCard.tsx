@@ -21,10 +21,14 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
   const [beadColor, setBeadColor] = useState('gold');
   const [showBeadCustomizer, setShowBeadCustomizer] = useState(false);
   
+  // Text to speak - prioritize Arabic text
+  const textToSpeak = dhikr.textAr || dhikr.textEn || dhikr.nameAr || dhikr.nameEn;
+  const speechLang = dhikr.textAr ? 'ar-SA' : 'en-US'; // Use Arabic for Arabic text
+  
   // Initialize text to speech with the dhikr text
   const { speak, isEnabled: speechEnabled, toggleEnabled: toggleSpeech } = useTextToSpeech({
-    text: dhikr.textAr || dhikr.textEn || dhikr.nameAr || dhikr.nameEn,
-    lang: dhikr.textAr ? 'ar-SA' : 'en-US', // Use Arabic for Arabic text
+    text: textToSpeak,
+    lang: speechLang,
     rate: 0.8, // Slightly slower for better comprehension
     enabled: true,
   });
@@ -49,15 +53,11 @@ const DhikrCard: React.FC<DhikrCardProps> = ({ dhikr, loopSize }) => {
 
   const handleTasbihTap = () => {
     // Speak the dhikr text when tasbih is tapped
-    if (speechEnabled) {
-      speak();
+    if (speechEnabled && textToSpeak) {
+      console.log(`Attempting to speak: ${textToSpeak} in ${speechLang}`);
+      speak(textToSpeak, speechLang);
     }
   };
-
-  // Apply entry animation when dhikr changes
-  useEffect(() => {
-    // Reset animation here if needed
-  }, [dhikr]);
 
   return (
     <div className="glass-effect w-full max-w-md mx-auto rounded-3xl overflow-hidden animate-fade-in dark:bg-gray-800/90 dark:border-gray-700/50 shadow-lg">

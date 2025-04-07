@@ -48,18 +48,23 @@ const Index = () => {
       setTimeout(() => {
         context.close();
       }, 1000);
+      
+      // Initialize Web Speech API to request user permissions early
+      if ('speechSynthesis' in window) {
+        console.log('Initializing speech synthesis');
+        const testUtterance = new SpeechSynthesisUtterance('');
+        testUtterance.volume = 0; // Silent
+        window.speechSynthesis.speak(testUtterance);
+        window.speechSynthesis.cancel(); // Cancel it immediately
+        
+        // Load voices
+        window.speechSynthesis.getVoices();
+      } else {
+        console.warn('Speech synthesis not supported');
+      }
     } catch (error) {
       console.warn('Error preloading sounds:', error);
       setSoundsLoaded(true);
-    }
-    
-    // Initialize Web Speech API to request user permissions early
-    if ('speechSynthesis' in window) {
-      const testUtterance = new SpeechSynthesisUtterance('');
-      testUtterance.volume = 0; // Silent
-      testUtterance.rate = 0.1;
-      window.speechSynthesis.speak(testUtterance);
-      window.speechSynthesis.cancel(); // Cancel it immediately
     }
     
     const timeout = setTimeout(() => {
