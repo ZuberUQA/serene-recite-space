@@ -13,6 +13,25 @@ const Index = () => {
   const [soundsLoaded, setSoundsLoaded] = useState(false);
   const { toast } = useToast();
   
+  // Web Speech API initialization - moved here for early permission setup
+  useEffect(() => {
+    // Initialize Web Speech API to request user permissions early
+    if ('speechSynthesis' in window) {
+      console.log('Initializing speech synthesis');
+      
+      // Force load the voices and request permissions
+      window.speechSynthesis.getVoices();
+      
+      // Create an initial utterance to trigger permission request
+      const testUtterance = new SpeechSynthesisUtterance('');
+      testUtterance.volume = 0; // Silent
+      window.speechSynthesis.speak(testUtterance);
+      window.speechSynthesis.cancel(); // Cancel it immediately
+    } else {
+      console.warn('Speech synthesis not supported');
+    }
+  }, []);
+  
   useEffect(() => {
     const soundFiles = ['/tick.mp3', '/complete.mp3', '/reset.mp3'];
     let loadedCount = 0;
@@ -48,20 +67,6 @@ const Index = () => {
       setTimeout(() => {
         context.close();
       }, 1000);
-      
-      // Initialize Web Speech API to request user permissions early
-      if ('speechSynthesis' in window) {
-        console.log('Initializing speech synthesis');
-        const testUtterance = new SpeechSynthesisUtterance('');
-        testUtterance.volume = 0; // Silent
-        window.speechSynthesis.speak(testUtterance);
-        window.speechSynthesis.cancel(); // Cancel it immediately
-        
-        // Load voices
-        window.speechSynthesis.getVoices();
-      } else {
-        console.warn('Speech synthesis not supported');
-      }
     } catch (error) {
       console.warn('Error preloading sounds:', error);
       setSoundsLoaded(true);
@@ -118,6 +123,7 @@ const Index = () => {
             </p>
           </div>
           
+          {/* Render only one DhikrCard */}
           <DhikrCard 
             dhikr={currentDhikr} 
             loopSize={loopSize}

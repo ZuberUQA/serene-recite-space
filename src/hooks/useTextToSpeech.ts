@@ -44,6 +44,11 @@ export const useTextToSpeech = ({
       
       // Initial load attempt for Firefox/Safari
       loadVoices();
+      
+      // Force load voices after a short delay if they haven't loaded yet
+      if (voicesRef.current.length === 0) {
+        setTimeout(loadVoices, 500);
+      }
     } else {
       setIsSupported(false);
       console.warn('Text-to-speech is not supported in this browser');
@@ -58,19 +63,41 @@ export const useTextToSpeech = ({
 
   // Find the best voice for the language
   const getBestVoice = useCallback((language: string) => {
-    if (!voicesRef.current.length) return null;
+    if (!voicesRef.current.length) {
+      console.warn('No voices available yet');
+      return null;
+    }
+    
+    console.log(`Looking for voice for language: ${language}`);
+    console.log('Available voices:', voicesRef.current.map(v => `${v.name} (${v.lang})`));
     
     // Try to find an exact match
     let voice = voicesRef.current.find(v => v.lang === language);
+    if (voice) console.log(`Found exact match: ${voice.name} (${voice.lang})`);
     
     // If no exact match, try to find a voice with the same language code
     if (!voice) {
       const langCode = language.split('-')[0];
       voice = voicesRef.current.find(v => v.lang.startsWith(langCode));
+      if (voice) console.log(`Found partial match: ${voice.name} (${voice.lang})`);
     }
     
-    // Default to first available voice if no match
-    return voice || voicesRef.current[0];
+    // For Arabic, try different variants
+    if (!voice && language.startsWith('ar')) {
+      const arabicVoices = voicesRef.current.filter(v => v.lang.startsWith('ar'));
+      if (arabicVoices.length > 0) {
+        voice = arabicVoices[0];
+        console.log(`Found Arabic variant: ${voice.name} (${voice.lang})`);
+      }
+    }
+    
+    // Default to first available voice if no match and log warning
+    if (!voice) {
+      console.warn(`No matching voice found for ${language}, using default`);
+      return voicesRef.current[0];
+    }
+    
+    return voice;
   }, []);
 
   // Create and configure speech utterance
